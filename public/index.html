@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html ng-app="scotchLifetimeline">
+  <head>
+    <meta charset="utf-8">
+    <title>Lifetimeline</title>
+    <!-- SCROLLS -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"><!-- load bootstrap -->
+    <link rel="stylesheet" href="css/timesheet.min.css">
+    <link rel="stylesheet" href="css/bootstrap-datepicker.min.css">
+    <style>
+        html                    { overflow-y:scroll; }
+        body                    { padding-top:50px; }
+        #lifetimeline-list      { margin-bottom:30px; }
+    </style>
+
+    <!-- SPELLS -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script><!-- load jquery -->
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script><!-- load angular -->
+    <script src="core.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/bootstrap-datepicker.min.js"></script>
+    <script src="js/timesheet.js"></script>
+  </head>
+
+  <body id="mainCon" ng-controller="mainController">
+    <div class="container">
+      <div class="text-center">
+            <h2>Life Timeline <span class="label label-info">{{ lifetimelines.length }}</span></h2>
+      </div>
+      <br>
+      <div class="timesheet color-scheme-default" id="timesheet">
+        <div id="scaleyear" class="scale" style="width: 100%; padding-right: 15%;"></div>
+        <div id="scalemonth" class="scale" style="width: 100%; padding-right: 15%; padding-top: 17px;"></div>
+        <ul class="data"></ul>
+      </div>
+      <br>
+      <br>
+      <!-- FORM TO CREATE TODOS -->
+      <div id="lifetimeline-form" class="row">
+        <div class="col-xs-6 text-center">
+          <form ng-hide="editing">
+            <h4>Insert Timeline</h4>
+            <div class="form-group">
+              <label for="inputTitle">Title</label>
+              <p id="inputTitlespan"></p>
+              <!-- BIND THIS VALUE TO formData.text IN ANGULAR -->
+              <input type="text" class="form-control input-lg text-center" placeholder="title" ng-model="formData.title">
+            </div>
+            <div class="form-group">
+              <label for="inputDescription">Description</label>
+              <br>
+              <input for="inputlg" type="text" class="form-control input-lg text-center" placeholder="description" ng-model="formData.description">
+            </div>
+            <div class="form-group">
+              <label for="inputstartDate">Start date</label>
+              <p id="inputStartDatespan"></p>
+              <input type="text" id="datepickerstart" data-provide="datepicker" class="form-control input-lg text-center" ng-model="formData.startDate" placeholder="start date">
+            </div>
+            <div class="form-group">
+              <label for="inputendDate">End date</label>
+              <br>
+              <input type="text" id="datepickerend" data-provide="datepicker" class="form-control input-lg text-center" ng-model="formData.endDate" placeholder="end date">
+            </div>
+            <div class="form-group">
+              <label for="inputEmo">Emo</label>
+              <br>
+              <select class="form-control input-lg text-center" ng-model="formData.emoColor">
+                <option value="default">red</option>
+                <option value="lorem">green</option>
+                <option value="ipsum">blue</option>
+                <option value="dolor">yellow</option>
+                <option value="sit">purple</option>
+              </select>
+            </div>
+            <!-- createToDo() WILL CREATE NEW TODOS -->
+            <button type="submit" class="btn btn-primary btn-lg" ng-click="createLifetimeline()">Add</button>
+          </form>
+
+          <form ng-show="editing" ng-submit="hideEditing()">
+            <h4>Edit Timeline</h4>
+            <div class="form-group">
+              <label for="inputTitle">Title</label>
+              <p id="inputTitlespan"></p>
+              <!-- BIND THIS VALUE TO formData.text IN ANGULAR -->
+              <input type="text" class="form-control input-lg text-center" placeholder="title" ng-model="editData.title">
+            </div>
+            <div class="form-group">
+              <label for="inputDescription">Description</label>
+              <br>
+              <input for="inputlg" type="text" class="form-control input-lg text-center" placeholder="description" ng-model="editData.description">
+            </div>
+            <div class="form-group">
+              <label for="inputstartDate">Start date</label>
+              <p id="inputStartDatespan"></p>
+              <input type="text" id="datepickerstartupdate" data-provide="datepicker" class="form-control input-lg text-center" ng-model="editData.startDate.split('T')[0]" placeholder="start date">
+            </div>
+            <div class="form-group">
+              <label for="inputendDate">End date</label>
+              <br>
+              <input type="text" id="datepickerendupdate" data-provide="datepicker" class="form-control input-lg text-center" ng-model="editData.endDate.split('T')[0]" placeholder="end date">
+            </div>
+            <div class="form-group">
+              <label for="inputEmo">Emo</label>
+              <br>
+              <select class="form-control input-lg" style="text-align-last: center" ng-model="editData.emoColor">
+                <option value="default">red</option>
+                <option value="lorem">green</option>
+                <option value="ipsum">blue</option>
+                <option value="dolor">yellow</option>
+                <option value="sit">purple</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg">Cancel</button>
+            <!-- createToDo() WILL CREATE NEW TODOS -->
+            <button type="submit" class="btn btn-primary btn-lg" ng-click="updateLifetimeline(editData._id)">Update</button>
+          </form>
+        </div>
+
+        <div class="col-xs-6 text-center" id="detailedtimesheet">
+          <h4>Show Event in Detail</h4>
+          <br>
+          <ul class="list-unstyled">
+            <li id="detailedTitle"></li>
+            <li id="detailedEmotion"></li>
+            <li id="detailedStartEndDate"></li>
+            <li id="detailedDescription"></li>
+            <li><p id="detailedIdDelete"></p><p id="detailedIdEdit"></p></li>
+          </ul>
+          <br>
+        </div>
+      </div>
+      <!-- TODO LIST -->
+      <div id="lifetimeline-list" class="row col-sm-12 text-center">
+        <h3>Timeline</h3>
+        <a href="#" ng-model="isCollapse" ng-click="isCollapse = !isCollapse">Click to see lifetime table</a>
+        <!-- LOOP OVER THE TODOS IN $scope.lifetimelines -->
+        <div ng-show="isCollapse" class="form-group">
+          <table class="table">
+            <thead>
+              <tr>
+                <th class="col-xs-2 text-center">Title</th>
+                <th class="col-xs-2 text-center">Start Date</th>
+                <th class="col-xs-2 text-center">End Date</th>
+                <th class="col-xs-2 text-center">Description</th>
+              </tr>
+            </thead>
+            <tbody ng-repeat="lifetimeline in lifetimelines">
+              <tr class="background-{{lifetimeline.emoColor}}">
+                <td class="col-xs-2">{{ lifetimeline.title }}</td>
+                <td class="col-xs-2">{{lifetimeline.startDate.split('T')[0]}}</td>
+                <td class="col-xs-2">{{lifetimeline.endDate.split('T')[0]}}</td>
+                <td class="col-xs-4">{{lifetimeline.description}}</td>
+                <td class="col-md-1"><button class="btn btn-default" ng-click="deleteLifetimeline(lifetimeline._id)">Delete</button></td>
+                <td class="col-md-1"><button class="btn btn-default" ng-click="showEditing(); editformLifetimeline(lifetimeline._id);">Edit</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

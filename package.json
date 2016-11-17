@@ -1,0 +1,21 @@
+{
+  "name": "weblifetime",
+  "version": "1.0.0",
+  "description": "web project named lifetimeline",
+  "main": "server.js",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.14.0",
+    "method-override": "^2.1.3",
+    "mongoose": "^4.4.12",
+    "morgan": "^1.1.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Dayoun Lee",
+  "license": "ISC"
+}
